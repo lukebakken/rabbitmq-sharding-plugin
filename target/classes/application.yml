@@ -1,0 +1,42 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,clear-cache
+
+spring:
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 5672
+    cache:
+      connection:
+        mode: connection
+        size: 30
+  cloud:
+    stream:
+      function:
+        definition: receive;send
+      bindings:
+        send-out-0:
+          destination: testing
+        receive-in-0:
+          destination: testing
+          group: testing
+          consumer:
+            concurrency: 30
+      rabbit:
+        bindings:
+          accumulate-out-0:
+            producer:
+              exchangeType: x-modulus-hash
+              routingKeyExpression: headers['RoutingKey']
+          receive-in-0:
+            consumer:
+              declare-exchange: false
+              exchange-type: x-modulus-hash
+              bind-queue: false
+              queue-name-group-only: true
+              exclusive: false
+              auto-delete: false
